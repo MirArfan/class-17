@@ -1,25 +1,25 @@
-const usersModel = require("../models/userModel")
-
+const users = require("../models/userModel");
 
 exports.getUsers = async (ctx) => {
     try {
-        const user = await usersModel.get();
-        ctx.status=200;
-        ctx.body={statusCode: " success", user: user};
+        
+        ctx.status = 200;
+        ctx.body = { statusCode: "success", users: users };
     } catch (error) {
-        ctx.status=400;
-        ctx.body={statusCode: "failed"}
+        ctx.status = 400;
+        ctx.body = { statusCode: "failed getusers" };
     }
 };
+
 
 exports.saveUser = async (ctx) => {
     try {
-        const user=ctx.request.body;
-        ctx.status=200;
-        ctx.body={statusCode: " success created", user: user};
+        const newUser = ctx.request.body;
+        users.push(newUser);
+        ctx.status = 200;
+        ctx.body = { statusCode: "success created", users };
     } catch (error) {
-        ctx.status=400;
-        ctx.body={statusCode: "failed created"}
+        ctx.status = 400;
+        ctx.body = { statusCode: "failed created", error: error.message };
     }
 };
-

@@ -1,15 +1,15 @@
-exports.get = ()=>{
-    return{
-        name:'abir',
-        age: "23"
-    };
-}
 
 
-exports.post = ()=>{
-    return{
-        name:'hasan',
-        age: "27"
-    };
-}
+const users=[
+    {
+        username:" Mir arfan",
+        email: "arfan@gmail.com",
+    },
+    {
+        username:"Ajoy nath",
+        email: "Ajoy@gmail.com",
+    },
+]
+
+module.exports=users;
 
