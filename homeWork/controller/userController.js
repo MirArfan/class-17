@@ -54,6 +54,35 @@ exports.updateUser = async (ctx) => {
     }
 }
 
+exports.patchUser = async (ctx) => {
+    try {
+        const userId = ctx.params.id;
+        const { username, email } = ctx.request.body;
+
+        const userIndex = users.findIndex(user => user.id === userId);
+        if (userIndex === -1) {
+            ctx.status = 404;
+            ctx.body = { statusCode: "User not found" };
+            return;
+        }
+
+        if (username !== undefined) {
+            users[userIndex].username = username;
+        }
+        if (email !== undefined) {
+            users[userIndex].email = email;
+        }
+
+        ctx.body = { statusCode: "patch successfully", users };
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { statusCode: "Failed patch ", error: error.message };
+    }
+};
+
+
+
+
 
 exports.deletedUser = async (ctx) => {
     try {
@@ -66,3 +95,4 @@ exports.deletedUser = async (ctx) => {
         ctx.body = { statusCode: "failed delete user", error: error.message };
     }
 }
+
