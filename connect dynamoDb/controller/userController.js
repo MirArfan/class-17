@@ -1,11 +1,18 @@
-const AWS = require('aws-sdk');
+
 const { v4: uuidv4 } = require('uuid');
+const AWS = require('aws-sdk');
+const dotenv = require('dotenv');
 
-require('aws-sdk/lib/maintenance_mode_message').suppress = true;
+dotenv.config();
 
-// Create DynamoDB service object
-// const dynamodb = new AWS.DynamoDB();
-const dynamodb=require("../config/database");
+
+
+AWS.config.update({
+    region: "us-east-1",
+    endpoint: "http://localhost:8000",
+
+});
+const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 exports.getUsers = async (ctx) => {
     const params = {
@@ -24,20 +31,28 @@ exports.getUsers = async (ctx) => {
 
 
 exports.saveUser = async (ctx) => {
-    const newUser = {
-        id: 120,
-        username: ctx.request.body.username ,
-        email:  ctx.request.body.email 
-    };
-
+    // const newUser = {
+    //     id: 120,
+    //     username: ctx.request.body.username ,
+    //     email:  ctx.request.body.email 
+    // };
+    const { username, email } = ctx.request.body;
+    console.log(username, email)
+    const id = uuidv4();
     const params = {
         TableName: 'UsersTable',
-        Item: newUser
+
+        Item: {
+            id,
+            username,
+            email,
+
+        }
     };
     try {
         await dynamodb.put(params).promise();
         ctx.status = 200;
-        ctx.body = { statusCode: "success created", user: newUser };
+        ctx.body = { statusCode: "success created", user: params };
     } catch (error) {
         ctx.status = 400;
         ctx.body = { statusCode: "failed created", error: error.message };
@@ -46,7 +61,7 @@ exports.saveUser = async (ctx) => {
 
 
 exports.updateUser = async (ctx) => {
-    const userId = ctx.params.id;
+    const id = toString(ctx.params.id);
     const updatedAttributes = {
         username: { Value: { S: ctx.request.body.username }, Action: 'PUT' },
         email: { Value: { S: ctx.request.body.email }, Action: 'PUT' }
@@ -54,12 +69,12 @@ exports.updateUser = async (ctx) => {
 
     const params = {
         TableName: 'UsersTable',
-        Key: { id: { S: userId } },
+        Key: { id },
         AttributeUpdates: updatedAttributes
     };
 
     try {
-        await dynamodb.updateItem(params).promise();
+        await dynamodb.update(params).promise();
         ctx.status = 200;
         ctx.body = { statusCode: "successfully updated", userId: userId };
     } catch (error) {
@@ -69,13 +84,13 @@ exports.updateUser = async (ctx) => {
 };
 
 exports.deletedUser = async (ctx) => {
-    const userId = ctx.params.id;
+    const {id} =ctx.params;
     const params = {
         TableName: 'UsersTable',
-        Key: { id: { S: userId } }
+        Key: { id }
     };
     try {
-        await dynamodb.deleteItem(params).promise();
+        await dynamodb.delete(params).promise();
         ctx.body = { statusCode: "deleted user successfully" };
     } catch (error) {
         ctx.status = 400;
