@@ -8,18 +8,26 @@ dotenv.config();
 
 
 AWS.config.update({
-    region: "us-east-1",
-    endpoint: "http://localhost:8000",
+    region: process.env.region,
+    endpoint: process.env.endpoint,
 
 });
+
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 exports.getUsers = async (ctx) => {
+    const {id}=ctx.params;
+    // const id = toString(ctx.params.id);
     const params = {
-        TableName: 'UsersTable'
+        TableName: 'UsersTable',
+        Key:{
+            id,
+        }
     };
+   
+    
     try {
-        const data = await dynamodb.scan(params).promise();
+        const data = await dynamodb.get(params).promise();
         ctx.status = 200;
         ctx.body = { statusCode: "success", data };
     } catch (error) {

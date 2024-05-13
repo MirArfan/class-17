@@ -6,7 +6,7 @@ const router = new Router();
 // router.patch("/users/:id", patchUser);
 router.delete("/users/:id", deletedUser);
 router.put("/users/:id",updateUser);
-router.get("/users", getUsers);
+router.get("/users/:id", getUsers);
 router.post("/users", saveUser);
 
 module.exports = router;
